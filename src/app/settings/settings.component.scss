@@ -1,0 +1,26 @@
+@use '@angular/material' as mat;
+@import '../../mine-dark-theme.scss';
+:host{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px;
+  
+  // color: mat.get-theme-color($dark-theme, primary, 90);
+  // background-color: mat.get-theme-color($dark-theme, primary, 00);
+  // border: 2px solid mat.get-theme-color($dark-theme, primary);
+
+  // background-color: mat.get-theme-color($dark-theme,);;
+  .--wrapper{
+    display: flex;
+    margin-right: 40px;
+    margin-bottom: 15px;
+    .-sub-title{
+      display: flex;
+      align-items: center;
+      color: mat.get-theme-color($dark-theme, primary);
+      margin-right: 15px;
+    }
+  }
+}

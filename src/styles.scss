@@ -1,1 +1,93 @@
-/* You can add global styles to this file, and also import other style files */
+// @use '@angular/material' as mat;
+
+// @include mat.core();
+
+// $black-primary-palette: (
+//   50: #fdf9e8,
+//   100: #faeec6,
+//   200: #f6e5a2,
+//   300: #f1db80,
+//   400: #edd368,
+//   500: #e9cc52,
+//   600: #d8bb4d,
+//   700: #c3a647,
+//   800: #ae9142,
+//   900: #896d3a,
+//   contrast: (
+//     50 : #000000,
+//     100 : #000000,
+//     200 : #000000,
+//     300 : #ffffff,
+//     400 : #ffffff,
+//     500 : #ffffff,
+//     600 : #ffffff,
+//     700 : #ffffff,
+//     800 : #ffffff,
+//     900 : #ffffff,
+//   )
+// );
+
+// $black-primary: map.merge($black-primary-palette, 700);
+// // $black-primary: mat.define-palette($black-primary-palette, 700);
+// // $black-accent: mat.define-palette(mat.$indigo-palette, 200);
+// // $cv-front-warn: mat.define-palette(mat.$red-palette);
+
+
+// $black-theme: mat.define-dark-theme((
+//   color: (
+//     primary: $black-primary,
+//     accent: $black-accent,
+//     warn: $cv-front-warn,
+//   )
+// ));
+
+// body.professional{
+//   background: #1A1A1A;
+//   main{
+//     display: grid;
+//     grid-template-columns: 1fr 1fr;
+//     grid-template-rows: auto 1fr auto;
+//     column-gap: 4rem;
+//     margin: 0 auto;
+//     align-items: flex-start;
+//     align-content: baseline;
+//   }
+
+//   .settings{
+//     background-color: #1A1A1A;
+    
+//     app-theme-management{
+//       justify-content: center;
+//     }
+
+//     .theme-button{
+//       background: transparent;
+//       color: mat.get-theme-color($black-theme, primary, default);
+//       &.professional, &.white {
+//         &:before, &:after {
+//           background-color: mat.get-theme-color($black-theme, primary, default);
+//         }
+//       }
+//       &:active, &:focus, &.active{
+//         color: mat.get-theme-color($black-theme, primary, 300);
+//         &.professional {
+//           filter: drop-shadow(0 0 1rem mat.get-theme-color($black-theme, primary, 100, 0.7));
+//         }
+//       }
+//     }
+//   }
+// }
+
+// .professional{
+//   @include mat.all-component-themes($black-theme);
+// }
+// html, body { height: 100%; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  box-sizing: border-box;
+}
+
+*{
+  box-sizing: border-box;
+}

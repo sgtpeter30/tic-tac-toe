@@ -1,0 +1,11 @@
+<div class="board">
+  @if (gameState.won) {
+    <span class="player-won">Player {{gameState.activePlayer}} won!</span>
+  }
+  @if (gameState.draw) {
+    <span class="player-won">Draw!</span>
+  }
+  @for (field of gameState.board; track $index) {
+    <app-field [value]="field" [disabled]="gameState.won || gameState.draw" (click)="makeMove($index)"></app-field>
+  }
+</div>

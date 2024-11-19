@@ -1,0 +1,41 @@
+@use '@angular/material' as mat;
+@import '../../mine-dark-theme.scss';
+
+:host{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 50px;
+  position: relative;
+  .board{
+    display: grid;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    width: calc(3 * var(--board-field-width));
+    height: calc(3 * var(--board-field-height));
+    grid-template-columns: repeat(3, var(--board-field-width));
+    grid-template-rows: repeat(3, var(--board-field-height));
+    margin: 0 auto;
+    position: relative;
+    &:after{
+      content: "";
+      display: var(--won-display);
+      position: absolute;
+      width: calc(3 * var(--board-field-width));
+      height: 10px;
+      background-color: mat.get-theme-color($dark-theme, primary);
+      top: var(--won-top-position);
+      left: var(--won-left-position);
+      rotate: var(--won-rotate);
+    }
+  }
+  .player-won{
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    translate: -50% 0;
+    color: mat.get-theme-color($dark-theme, primary);
+  }
+}

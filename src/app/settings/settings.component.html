@@ -1,0 +1,25 @@
+<div class="--wrapper">
+  <div class="-sub-title">Current player:</div> {{gameInfo.currentGame.activePlayer}}
+</div>
+<div class="--wrapper">
+  <div class="-sub-title">Player count:</div>
+  <mat-slide-toggle [checked]="gameInfo.settings.players > 1" (change)="triggerChangePlayerNumber()">{{gameInfo.settings.players}}</mat-slide-toggle>
+</div>
+<div class="--wrapper">
+  <div class="-sub-title">Difficulty:</div>
+  <mat-button-toggle-group
+    name="difficulty"
+    aria-label="Difficulty"
+    [hideSingleSelectionIndicator]="true"
+    [disabled]="gameInfo.settings.players > 1"
+    (change)="triggerSetDifficulty($event)"
+    [value]="gameInfo.settings.level"
+  >
+    <mat-button-toggle value="easy">easy</mat-button-toggle>
+    <mat-button-toggle value="medium">medium</mat-button-toggle>
+    <mat-button-toggle value="hard">hard</mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+<div class="--wrapper">
+  <button class="restart-button secondary-button" mat-raised-button (click)="restartGame()">Restart Game</button>
+</div>
