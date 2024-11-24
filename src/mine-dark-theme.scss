@@ -173,8 +173,12 @@ $dark-theme: mat.define-theme((
 
 :root{
   --won-display: none;
-  --board-field-height: 200px;
-  --board-field-width: 200px;
+  --board-field-height: 100px;
+  --board-field-width: 100px;
+  @media (min-width: 979px){
+    --board-field-height: 200px;
+    --board-field-width: 200px;
+  }
 }
 
 body{

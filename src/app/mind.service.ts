@@ -1,10 +1,9 @@
-import { computed, effect, EffectRef, Injectable, Signal, signal } from '@angular/core';
+import { computed, Injectable, Signal, signal } from '@angular/core';
 import { MindModel } from './models/mind.model';
-import { CurrentGameModel } from './models/current-game.model';
-import { isEmpty } from 'rxjs';
+import { CurrentGameModel, Moves, Player } from './models/current-game.model';
 import { winningConditions } from './constants/winning-conditions';
 import { StripeModel } from './models/winning-conditions.model';
-import { findBestMove } from './constants/optimal-move-function-copy';
+import _ from 'lodash';
 
 @Injectable({
   providedIn: 'root'
@@ -14,58 +13,52 @@ export class MindService {
     currentGame: {
       won: false,
       draw: false,
+      humanPlayer: 'X',
       activePlayer: 'X',
       board: Array(9).fill(""),
     },
     settings: {
       players: 2,
-      level: 'easy'
+      level: 'hard'
     }
   })
   public gameReadOnly: Signal<MindModel> = computed(() => this.mindStore())
 
+  testObject: any = {};
+
   public makeMove(index: number) {
     const currentMind = this.mindStore()
-    console.log(currentMind.currentGame.board[index])
-    if (!currentMind.currentGame.board[index] && !currentMind.currentGame.won && !currentMind.currentGame.draw) {
+    console.log('activePlayer: ' + currentMind.currentGame.activePlayer)
+    if (!currentMind.currentGame.board[index] && !this.isGameEnded(currentMind.currentGame)) {
       currentMind.currentGame.board[index] = currentMind.currentGame.activePlayer;
       currentMind.currentGame = this.checkWonCondidtion(currentMind.currentGame);
-      // if single-player
-      if (currentMind.settings.players === 1)
-        currentMind.currentGame.board = this.letAIMove(currentMind.currentGame.board);
+
       // change player
-      if (!currentMind.currentGame.won && !currentMind.currentGame.draw && currentMind.settings.players > 1)
-        currentMind.currentGame.activePlayer === "X" ? currentMind.currentGame.activePlayer = "O" : currentMind.currentGame.activePlayer = "X";
+      if (!this.isGameEnded(currentMind.currentGame)) {
+        console.log("change currentMind")
+        currentMind.currentGame.activePlayer = this.switchActivePlayer(currentMind.currentGame.activePlayer)
+      }
+
+      // if single-player
+      if (currentMind.settings.players === 1 && !this.isGameEnded(currentMind.currentGame)) {
+        console.log("yep proper settings for AI")
+        currentMind.currentGame.board = this.letAIMove(currentMind.currentGame);
+        currentMind.currentGame = this.checkWonCondidtion(currentMind.currentGame);
+        if (!this.isGameEnded(currentMind.currentGame)) {
+          currentMind.currentGame.activePlayer = this.switchActivePlayer(currentMind.currentGame.activePlayer)
+        }
+        console.log(currentMind.currentGame.activePlayer)
+      }
+      // this.testAiMove();
+
 
       this.mindStore.update(() => currentMind)
     }
   }
 
-  private letAIMove(board: string[]) {
-    // const currentMind = this.mindStore()
-    // console.log(currentMind.currentGame.board)
-    // const currBoard = currentMind.currentGame.board
-    // const groupSize = 3
-    // const board = [];
-    // for (const item of currBoard.map((value, index) => ({ index, value }))) {
-    // for (let i = 0; i < currBoard.length; i += groupSize) {
-    //   const chunk = currBoard.slice(i, i + groupSize);
-    //   board.push(chunk);
-    // }
-    // let board = [ [ 'x', 'o', 'x' ], 
-    //           [ 'o', 'o', 'x' ], 
-    //           [ '_', '_', '_' ] ]; 
-    // console.log(board)
-    // const bestMove = findBestMove(board); 
-    // console.log(bestMove)
-    const bestMove = this.findBestMove(board)
-    console.log(bestMove)
-    if (bestMove !== -1) {
-      board[bestMove] = 'O';
-    }else{
-
-    }
-    return board
+  isGameEnded(currentGame: CurrentGameModel) {
+    console.log(currentGame)
+    return currentGame.won || currentGame.draw
   }
 
   private checkWonCondidtion(currentGame: CurrentGameModel): CurrentGameModel {
@@ -115,67 +108,106 @@ export class MindService {
     console.log("restart")
   }
 
+  private letAIMove(currentGame: CurrentGameModel): Moves[] {
+    const board: Moves[] = Array.from(currentGame.board)
+    const aiPlayer = currentGame.activePlayer;
+    console.log("AI move")
+    console.log(aiPlayer)
 
-  private findBestMove(board: string[]): number {
-    console.log("findBestMove")
-    // Implement Minimax algorithm here
-    let bestVal = -99999;
-    let bestMove = -1;
+    const bestMove = this.findBestMove(board)
+    board[bestMove] = aiPlayer;
 
-    for (let i = 0; i < board.length; i++) {
-      console.log(board[i])
-      if (board[i] === "") {
-        board[i] = 'O'; // AI's turn
-        const moveVal = this.minimax(board, 0, false);
-        console.log(moveVal)
-        board[i] = ""; // Undo move
+    return board;
+  }
 
-        if (moveVal > bestVal) {
-          bestMove = i;
-          bestVal = moveVal;
-        }
+  private findBestMove(board: Moves[]): number {
+    let bestScore = Infinity; // Minimalizacja dla O
+    let bestMove: number | null = null; // Przechowuje najlepszy ruch
+    const availableMoves = this.getAvailableMoves(board);
+
+    for (const move of availableMoves) {
+      board[move] = 'O'; // Symulacja ruchu dla O
+      const moveScore = this.minMax(board, true); // Sprawdź wynik dla ruchu
+      board[move] = ""; // Cofnij ruch      
+      if (moveScore < bestScore) {
+        bestScore = moveScore;
+        bestMove = move;
       }
     }
+    if (bestMove === null) {
+      return availableMoves[0]; // Fallback
+    }
+    console.log(`Best move selected: ${bestMove}, Score: ${bestScore}`);
     return bestMove;
   }
 
-  private minimax(board: string[], depth: number, isMaximizing: boolean): number {
-    const scores: { [key: string]: number } = { X: -10, O: 10, tie: 0 };
-    const winner = this.evaluateBoard(board);
-
-    if (winner) return scores[winner];
-
-    if (isMaximizing) {
-      let bestVal = -Infinity;
-
-      for (let i = 0; i < board.length; i++) {
-        if (board[i] === "") {
-          board[i] = 'O'; // AI's turn
-          bestVal = Math.max(bestVal, this.minimax(board, depth + 1, false));
-          board[i] = ""; // Undo move
-        }
-      }
-      return bestVal;
-    } else {
-      let bestVal = Infinity;
-
-      for (let i = 0; i < board.length; i++) {
-        if (board[i] === "") {
-          board[i] = 'X'; // Player's turn
-          bestVal = Math.min(bestVal, this.minimax(board, depth + 1, true));
-          board[i] = ""; // Undo move
-        }
-      }
-      return bestVal;
+  private minMax(board: Moves[], isMaximizing: boolean): number {
+    const score = this.evaluateBoardForAI(board);
+    if (score !== null) {
+      return score; // Zwróć wynik, jeśli gra się skończyła
     }
+
+    const user = this.gameReadOnly().currentGame.humanPlayer
+    const availableMoves = this.getAvailableMoves(board);
+    if (isMaximizing) {
+      let bestScoreX = -Infinity;
+      for (const move of availableMoves) {
+        board[move] = user; // Symulacja ruchu dla X
+        const moveScore = this.minMax(board, false); // Rekurencja
+        board[move] = ""; // Cofnij ruch
+        bestScoreX = Math.max(bestScoreX, moveScore);
+      }
+      return bestScoreX;
+    } else {
+      let bestScore = Infinity; // Minimalizacja dla O
+      for (const move of availableMoves) {
+        board[move] = this.switchActivePlayer(user); // Symulacja ruchu dla O
+        const moveScore = this.minMax(board, true); // Rekurencja
+        board[move] = ""; // Cofnij ruch
+        bestScore = Math.min(bestScore, moveScore);
+      }
+      return bestScore;
+    }
+  };
+
+  private getAvailableMoves(board: string[]): number[] {
+    return board.map((value, index) => (value === "" ? index : "")).filter(index => index !== "")
   }
-  private evaluateBoard(board: string[]){
+
+  private evaluateBoardForAI(board: string[], player?: any) {
+    const user = this.gameReadOnly().currentGame.humanPlayer
     for (let condition of winningConditions) {
       const [a, b, c] = condition.winIndex;
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a];
+        return board[a] === user ? 1 : -1;
       }
     }
-    return null;
+    if (board.find(item => !item) !== undefined) {
+      return null;
+    }
+    return 0;
+  }
+
+  switchActivePlayer(currentActive: "X" | "O") {
+    return currentActive === "X" ? "O" : "X"
+  }
+
+  public testAI() {
+    const mind = this.mindStore();
+    mind.settings.players = 1;
+    mind.currentGame.humanPlayer = "X",
+      mind.currentGame.activePlayer = "O",
+      mind.currentGame.draw = false,
+      mind.currentGame.won = false,
+      mind.currentGame.board = [
+        'X', 'O', 'X',
+        '', '', '',
+        'O', '', 'X'
+      ];
+    this.mindStore.update(() => mind)
+
+    mind.currentGame.board = this.letAIMove(mind.currentGame);
+    console.log("test AI")
+    this.mindStore.update(() => mind)
   }
 }

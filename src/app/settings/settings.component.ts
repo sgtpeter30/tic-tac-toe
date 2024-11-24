@@ -23,6 +23,10 @@ export class SettingsComponent {
     this.mindService.restartGame()
   }
 
+  testAI(){
+    this.mindService.testAI()
+  }
+
   triggerChangePlayerNumber(){
     this.mindService.changePlayerNumber();
   }

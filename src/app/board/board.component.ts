@@ -19,21 +19,9 @@ export class BoardComponent {
   private mindService = inject(MindService)
   gameState = this.mindService.gameReadOnly().currentGame
 
-  // get player() {
-    // return this.xIsNext ? 'X' : 'O';
-  // }
-
   makeMove(index: number) {
-    this.mindService.makeMove(index);
-    // if (!this.fields[index] && !this.winner) {
-    //   this.fields[index] = this.player;
-    //   this.xIsNext = !this.xIsNext;
-    //   this.winner = this.calculateWinner();
-    //   console.log("now AI move")
-    //   if (!this.winner) {
-    //     console.log("funcutoi")
-    //     this.aiMove();
-    //   }
-    // }
+    if(!(this.gameState.won || this.gameState.draw)){
+      this.mindService.makeMove(index);
+    }
   }
 }

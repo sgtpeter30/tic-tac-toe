@@ -1,7 +1,12 @@
 export interface CurrentGameModel{
   won: boolean,
   draw: boolean,
-  activePlayer: 'X' | 'O'
-  board: string[],
+  humanPlayer: Player
+  activePlayer: Player
+  board: Moves[],
   strike?: any,
 }
+
+export type Player = 'X' | 'O'
+export type Moves = 'X' | 'O' | ""
+
